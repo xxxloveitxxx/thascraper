@@ -4,10 +4,6 @@
   "version": "1.0",
   "permissions": ["activeTab", "scripting"],
   "host_permissions": ["https://thascraper-mcp.onrender.com/*"],
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": "icon.png"
-  },
   "icons": {
     "16": "icon.png",
     "48": "icon.png",
