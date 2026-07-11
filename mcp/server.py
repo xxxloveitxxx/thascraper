@@ -8,10 +8,11 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
+# Simple in-memory storage for commands
 pending_command = None
 
 @app.post("/command")
@@ -31,7 +32,7 @@ async def get_command():
 
 @app.post("/results")
 async def store_results(results: dict):
-    print("Scraped data:", results)  # Forward to Hermes later
+    print("Scraped data:", results)  # Log to Render console
     return {"status": "Saved"}
 
 if __name__ == "__main__":
