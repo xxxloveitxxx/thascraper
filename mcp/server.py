@@ -8,26 +8,34 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET"],  # Only allow GET requests
     allow_headers=["*"],
 )
 
 # Simple in-memory storage for commands
 pending_command = None
 
-@app.post("/command")
-async def send_command(command: dict):
-    global pending_command
-    pending_command = command
-    return {"status": "Command queued"}
-
 @app.get("/command")
-async def get_command():
+async def handle_command(action: str = "", price_selector: str = "", address_selector: str = ""):
     global pending_command
+    
+    # If parameters are provided, queue a command
+    if action and price_selector and address_selector:
+        pending_command = {
+            "action": action,
+            "selectors": {
+                "price": price_selector,
+                "address": address_selector
+            }
+        }
+        return {"status": "Command queued"}
+    
+    # Otherwise, retrieve and clear the command
     if pending_command:
         cmd = pending_command
         pending_command = None
         return cmd
+    
     raise HTTPException(status_code=404, detail="No command")
 
 @app.post("/results")

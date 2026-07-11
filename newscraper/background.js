@@ -2,6 +2,7 @@ const MCP_SERVER = "https://thascraper-mcp.onrender.com";
 
 async function pollForCommands() {
   try {
+    // First, try to retrieve a command
     const response = await fetch(`${MCP_SERVER}/command`);
     if (response.ok) {
       const command = await response.json();
