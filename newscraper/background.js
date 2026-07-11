@@ -1,24 +1,23 @@
-const MCP_SERVER = "wss://thascraper-mcp.onrender.com/ws";  // Render URL
-let socket;
+const MCP_SERVER = "https://thascraper-mcp.onrender.com";
 
-function connectWebSocket() {
-  socket = new WebSocket(MCP_SERVER);
-
-  socket.onmessage = (event) => {
-    const command = JSON.parse(event.data);
-    if (command.action === "startScraping") {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: "scrape",
-          selectors: command.selectors
+async function pollForCommands() {
+  try {
+    const response = await fetch(`${MCP_SERVER}/command`);
+    if (response.ok) {
+      const command = await response.json();
+      if (command.action === "startScraping") {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            action: "scrape",
+            selectors: command.selectors
+          });
         });
-      });
+      }
     }
-  };
-
-  socket.onclose = () => {
-    setTimeout(connectWebSocket, 5000);  // Reconnect
-  };
+  } catch (err) {
+    console.error("Polling error:", err);
+  }
+  setTimeout(pollForCommands, 5000);  // Poll every 5 seconds
 }
 
-connectWebSocket();
+pollForCommands();
